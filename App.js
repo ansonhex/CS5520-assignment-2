@@ -11,6 +11,8 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import colors from "./styles/colors";
+import ThemeProvider, { useTheme } from "./context/ThemeContext";
+import { useContext } from "react";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -23,6 +25,7 @@ const defaultScreenOptions = {
 };
 
 function ActivitiesStack() {
+  const { theme } = useTheme();
   return (
     <Stack.Navigator screenOptions={defaultScreenOptions}>
       <Stack.Screen
@@ -44,6 +47,7 @@ function ActivitiesStack() {
 }
 
 function DietStack() {
+  const { theme } = useTheme();
   return (
     <Stack.Navigator screenOptions={defaultScreenOptions}>
       <Stack.Screen
@@ -64,51 +68,64 @@ function DietStack() {
   );
 }
 
+function MainApp() {
+  const { theme } = useTheme();
+  return (
+    <ThemeProvider>
+      <View
+        style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+      >
+        <NavigationContainer>
+          <Tab.Navigator
+            screenOptions={({ route }) => ({
+              tabBarIcon: ({ color, size }) => {
+                if (route.name === "Activities") {
+                  return (
+                    <FontAwesome5 name="running" size={size} color={color} />
+                  );
+                } else if (route.name === "Diet") {
+                  return (
+                    <MaterialIcons name="fastfood" size={size} color={color} />
+                  );
+                } else if (route.name === "Settings") {
+                  return <Ionicons name="settings" size={size} color={color} />;
+                }
+              },
+              tabBarActiveTintColor: "orange",
+              tabBarInactiveTintColor: "gray",
+              tabBarLabelStyle: {
+                fontSize: 12,
+              },
+              tabBarStyle: {
+                backgroundColor: colors.primaryBg,
+              },
+              tabBarLabelPosition: "below-icon",
+              headerShown: false,
+            })}
+          >
+            <Tab.Screen name="Activities" component={ActivitiesStack} />
+            <Tab.Screen name="Diet" component={DietStack} />
+            <Tab.Screen
+              name="Settings"
+              component={Settings}
+              options={{
+                ...defaultScreenOptions,
+                headerShown: true,
+              }}
+            />
+          </Tab.Navigator>
+        </NavigationContainer>
+      </View>
+    </ThemeProvider>
+  );
+}
+
 export default function App() {
   return (
-    <View style={styles.container}>
-      <NavigationContainer>
-        <Tab.Navigator
-          screenOptions={({ route }) => ({
-            tabBarIcon: ({ color, size }) => {
-              if (route.name === "Activities") {
-                return (
-                  <FontAwesome5 name="running" size={size} color={color} />
-                );
-              } else if (route.name === "Diet") {
-                return (
-                  <MaterialIcons name="fastfood" size={size} color={color} />
-                );
-              } else if (route.name === "Settings") {
-                return <Ionicons name="settings" size={size} color={color} />;
-              }
-            },
-            tabBarActiveTintColor: "orange",
-            tabBarInactiveTintColor: "gray",
-            tabBarLabelStyle: {
-              fontSize: 12,
-            },
-            tabBarStyle: {
-              backgroundColor: colors.primaryBg,
-            },
-            tabBarLabelPosition: "below-icon",
-            headerShown: false,
-          })}
-        >
-          <Tab.Screen name="Activities" component={ActivitiesStack} />
-          <Tab.Screen name="Diet" component={DietStack} />
-          <Tab.Screen
-            name="Settings"
-            component={Settings}
-            options={{
-              ...defaultScreenOptions,
-              headerShown: true,
-            }}
-          />
-        </Tab.Navigator>
-      </NavigationContainer>
-    </View>
-  );
+    <ThemeProvider>
+      <MainApp />
+    </ThemeProvider>
+  )
 }
 
 const styles = StyleSheet.create({

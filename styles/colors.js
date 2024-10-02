@@ -3,7 +3,7 @@ const colors = {
   secondaryBg: "#AAAAC8",
   primaryBgDark: "#605E90",
   darkText: "#363876",
-  lightText: "#fff",
+  lightText: "white",
 }
 
 export default colors;

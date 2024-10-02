@@ -1,6 +1,7 @@
-import { Button, StyleSheet, Text, View } from "react-native";
-import React, { useContext } from "react";
+import { TouchableOpacity, StyleSheet, Text, View } from "react-native";
+import React from "react";
 import { useTheme } from "../context/ThemeContext";
+import colors from "../styles/colors";
 
 const Settings = () => {
   const { theme, toggleTheme } = useTheme();
@@ -9,7 +10,9 @@ const Settings = () => {
     <View
       style={[styles.container, { backgroundColor: theme.backgroundColor }]}
     >
-      <Button title="Toggle Theme" onPress={toggleTheme} />
+      <TouchableOpacity style={styles.button} onPress={toggleTheme}>
+        <Text style={styles.text}>Toggle Theme</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -24,5 +27,13 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
+  },
+  button: {
+    padding: 10,
+    backgroundColor: colors.primaryBg,
+    borderRadius: 5,
+  },
+  text: {
+    color: colors.lightText,
   },
 });

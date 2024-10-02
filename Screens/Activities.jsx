@@ -1,10 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, Button } from 'react-native'
 import React from 'react'
 
-const Activities = () => {
+const Activities = ({ navigation }) => {
   return (
     <View>
       <Text>Activities</Text>
+      <Button title="Add Activities" onPress={() => navigation.navigate("AddActivitiesScreen")} />
     </View>
   )
 }

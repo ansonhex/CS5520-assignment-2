@@ -1,4 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState, useContext } from "react";
 import { ActivityContext } from "../context/ActivityContext";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -63,9 +69,24 @@ const AddActivities = ({ navigation }) => {
     navigation.goBack();
   };
 
+  // handle date input to show
+  const handleDateInput = () => {
+    setShowDatePicker(true);
+  };
+
+  // handle date change
+  const onChangeDate = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(false);
+    setDate(currentDate);
+  };
+
   return (
-    <View>
-      <Text style={[styles.label, {color: theme.darkText}]}>Activity *</Text>
+    <View
+      style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+    >
+      {/* Activity Dropdown */}
+      <Text style={[styles.label, { color: theme.textColor }]}>Activity *</Text>
       <DropDownPicker
         open={showDropdown}
         value={activityType}
@@ -75,6 +96,49 @@ const AddActivities = ({ navigation }) => {
         setItems={setItems}
         style={styles.dropdown}
       />
+
+      {/* Duration */}
+      <Text style={[styles.label, { color: theme.textColor }]}>
+        Duration (min) *
+      </Text>
+      <TextInput
+        keyboardType="numeric"
+        value={activityDuration}
+        onChangeText={(text) => setActivityDuration(text)}
+        style={[styles.input, { color: theme.textColor }]}
+      />
+
+      {/* DatePicker Text */}
+      <Text style={[styles.label, { color: theme.textColor }]}>Date *</Text>
+      <TextInput
+        value={date.toLocaleDateString()}
+        onPressIn={handleDateInput}
+        style={[
+          styles.input,
+          { color: theme.textColor },
+        ]}
+        placeholder="Select Date"
+        placeholderTextColor={colors.primaryBg}
+      />
+      {/* DatePicker */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          display="calendar"
+          onChange={onChangeDate}
+        />
+      )}
+
+      {/* Save and Cancel Buttons */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={handleCancel}>
+          <Text style={styles.cancelButton}>Cancel</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleSave}>
+          <Text style={styles.saveButton}>Save</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -82,13 +146,47 @@ const AddActivities = ({ navigation }) => {
 export default AddActivities;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    alignItems: "flex-start",
+  },
   dropdown: {
-    borderRadius: 10,
-    margin: 10,
+    borderRadius: 5,
+    marginBottom: 10,
     borderColor: colors.primaryBg,
+    width: "100%",
   },
   label: {
     fontSize: 16,
-    marginBottom: 10,
+    marginVertical: 5,
+    fontWeight: "bold",
+    paddingVertical: 5,
+  },
+  input: {
+    width: "100%",
+    boardWidth: 3,
+    boarderColor: "black",
+    marginBottom: 20,
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    padding: 10,
+    height: 40,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    paddingVertical: 20,
+  },
+  cancelButton: {
+    color: "blue",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  saveButton: {
+    color: "blue",
+    fontSize: 18,
+    fontWeight: "600",
   },
 });

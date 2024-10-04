@@ -55,7 +55,7 @@ const AddActivities = ({ navigation }) => {
       const newActivity = {
         type: activityType,
         duration: activityDuration,
-        date: date.toLocaleDateString(),
+        date: date.toLocaleDateString("en-US"),
         special: isSpecial,
       };
 
@@ -106,37 +106,41 @@ const AddActivities = ({ navigation }) => {
         value={activityDuration}
         onChangeText={(text) => setActivityDuration(text)}
         style={[styles.input, { color: theme.textColor }]}
+        blurOnSubmit={true}
+        returnKeyType="done" // added done to iOS numeric keyboard
       />
 
       {/* DatePicker Text */}
       <Text style={[styles.label, { color: theme.textColor }]}>Date *</Text>
-      <TextInput
-        value={date.toLocaleDateString()}
-        onPressIn={handleDateInput}
-        style={[
-          styles.input,
-          { color: theme.textColor },
-        ]}
-        placeholder="Select Date"
-        placeholderTextColor={colors.primaryBg}
-      />
-      {/* DatePicker */}
+      <TouchableOpacity onPress={handleDateInput} style={{ width: "100%" }}>
+        <View pointerEvents="none">
+          <TextInput
+            value={date.toLocaleDateString("en-US")}
+            style={[styles.input, { color: theme.textColor }]}
+            editable={false} // Disable the keyboard interaction but allow onPress event
+          />
+        </View>
+      </TouchableOpacity>
+
+      {/* DatePicker, wrapped in view for center */}
       {showDatePicker && (
-        <DateTimePicker
-          value={date}
-          mode="date"
-          display="calendar"
-          onChange={onChangeDate}
-        />
+        <View style={styles.datePickerContainer}>
+          <DateTimePicker
+            value={date}
+            mode="date"
+            display="inline"
+            onChange={onChangeDate}
+          />
+        </View>
       )}
 
       {/* Save and Cancel Buttons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleCancel}>
-          <Text style={styles.cancelButton}>Cancel</Text>
+        <TouchableOpacity onPress={handleCancel} style={styles.button}>
+          <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleSave}>
-          <Text style={styles.saveButton}>Save</Text>
+        <TouchableOpacity onPress={handleSave} style={styles.button}>
+          <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -165,8 +169,8 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-    boardWidth: 3,
-    boarderColor: "black",
+    borderWidth: 1,
+    borderColor: "black",
     marginBottom: 20,
     backgroundColor: "#fff",
     borderRadius: 5,
@@ -179,14 +183,18 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingVertical: 20,
   },
-  cancelButton: {
-    color: "blue",
-    fontSize: 18,
-    fontWeight: "600",
+  button: {
+    backgroundColor: colors.primaryBg,
+    padding: 15,
+    borderRadius: 10,
   },
-  saveButton: {
-    color: "blue",
-    fontSize: 18,
-    fontWeight: "600",
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  datePickerContainer: {
+    width: "100%",
+    alignItems: "center",
   },
 });

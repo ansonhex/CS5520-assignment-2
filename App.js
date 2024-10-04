@@ -13,6 +13,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import colors from "./styles/colors";
 import ThemeProvider, { useTheme } from "./context/ThemeContext";
 import { ActivityProvider } from "./context/ActivityContext";
+import { DietProvider } from "./context/DietContext";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -117,10 +118,13 @@ function MainApp() {
 }
 
 export default function App() {
+  // wrapped the MainApp with the all the context providers
   return (
     <ThemeProvider>
-      <ActivityProvider>
-        <MainApp />
+      <ActivityProvider>  
+        <DietProvider>
+          <MainApp />
+        </DietProvider>
       </ActivityProvider>
     </ThemeProvider>
   );

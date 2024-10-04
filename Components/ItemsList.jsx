@@ -1,20 +1,27 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { useTheme } from "../context/ThemeContext";
 import colors from "../styles/colors";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const ItemsList = ({ items, type }) => {
-  const { theme } = useTheme();
-  console.log(theme);
-
   return (
     <View style={styles.container}>
       {items.map((item, index) => (
         <View key={index} style={styles.item}>
           {/* Left: Type or Description */}
-          <Text style={styles.title}>
-            {type === "activity" ? item.type : item.description}
-          </Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>
+              {type === "activity" ? item.type : item.description}
+            </Text>
+            {item.special && (
+              <FontAwesome
+                name="warning"
+                size={18}
+                color={colors.warningColor}
+                style={styles.icon}
+              />
+            )}
+          </View>
 
           {/* Middle: Date */}
           <Text style={styles.details}>{item.date}</Text>
@@ -46,17 +53,28 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
   title: {
     color: colors.secondaryBg,
     fontWeight: "bold",
     fontSize: 20,
+    flex: 1,
+  },
+  icon: {
+    marginLeft: 5,
   },
   details: {
     color: colors.darkText,
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 16,
     textAlign: "center",
     backgroundColor: "white",
-    padding: 10,
+    lineHeight: 40,
+    marginLeft: 10,
+    flex: 1,
   },
 });

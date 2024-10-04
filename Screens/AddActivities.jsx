@@ -56,7 +56,7 @@ const AddActivities = ({ navigation }) => {
   const handleSave = () => {
     if (validateData()) {
       const isSpecial =
-        (activityType === "running" || activityType === "weights") &&
+        (activityType === "Running" || activityType === "Weights") &&
         activityDuration > 60;
 
       const newActivity = {

@@ -3,7 +3,6 @@ import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { ActivityContext } from '../context/ActivityContext';
 import ItemsList from '../Components/ItemsList';
 import { useTheme } from '../context/ThemeContext';
-import Ionicons from '@expo/vector-icons/Ionicons';
 
 const Activities = ({ navigation }) => {
   const { activities } = useContext(ActivityContext);

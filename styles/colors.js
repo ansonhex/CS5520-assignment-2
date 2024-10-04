@@ -4,6 +4,7 @@ const colors = {
   primaryBgDark: "#605E90",
   darkText: "#363876",
   lightText: "white",
+  warningColor: "#F5BC35"
 }
 
 export default colors;

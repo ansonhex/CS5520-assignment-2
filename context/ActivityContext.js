@@ -11,6 +11,7 @@ export const ActivityProvider = ({ children }) => {
 
   return (
     <ActivityContext.Provider value={{ activities, addActivity }}>
+      {console.log("ActivityProvider is working", activities)}
       {children}
     </ActivityContext.Provider>
   );

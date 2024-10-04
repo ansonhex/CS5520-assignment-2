@@ -23,11 +23,11 @@ const AddActivities = ({ navigation }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [items, setItems] = useState([
-    { label: "Walking", value: "walking" },
-    { label: "Running", value: "running" },
-    { label: "Swimming", value: "swimming" },
-    { label: "Weights", value: "weights" },
-    { label: "Yoga", value: "yoga" },
+    { label: "Walking", value: "Walking" },
+    { label: "Running", value: "Running" },
+    { label: "Swimming", value: "Swimming" },
+    { label: "Weights", value: "Weights" },
+    { label: "Yoga", value: "Yoga" },
     { label: "Cycling", value: "Cycling" },
     { label: "Hiking", value: "Hiking" },
   ]);

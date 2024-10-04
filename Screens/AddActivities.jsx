@@ -32,6 +32,13 @@ const AddActivities = ({ navigation }) => {
     { label: "Hiking", value: "Hiking" },
   ]);
 
+  const dateOptions = {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  };
+
   // validate the form and data
   const validateData = () => {
     if (!activityType) {
@@ -55,7 +62,7 @@ const AddActivities = ({ navigation }) => {
       const newActivity = {
         type: activityType,
         duration: activityDuration,
-        date: date.toLocaleDateString("en-US"),
+        date: date.toLocaleDateString("en-US", dateOptions),
         special: isSpecial,
       };
 
@@ -115,7 +122,7 @@ const AddActivities = ({ navigation }) => {
       <TouchableOpacity onPress={handleDateInput} style={{ width: "100%" }}>
         <View pointerEvents="none">
           <TextInput
-            value={date.toLocaleDateString("en-US")}
+            value={date.toLocaleDateString("en-US", dateOptions)}
             style={[styles.input, { color: theme.textColor }]}
             editable={false} // Disable the keyboard interaction but allow onPress event
           />

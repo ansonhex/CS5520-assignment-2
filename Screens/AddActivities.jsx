@@ -19,7 +19,7 @@ const AddActivities = ({ navigation }) => {
 
   const [activityType, setActivityType] = useState(null);
   const [activityDuration, setActivityDuration] = useState(null);
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(null); // initialize the date to null
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [items, setItems] = useState([
@@ -78,14 +78,19 @@ const AddActivities = ({ navigation }) => {
 
   // handle date input to show
   const handleDateInput = () => {
-    setShowDatePicker(true);
+    if (!date) {
+      setDate(new Date());
+    }
+    setShowDatePicker(!showDatePicker); // tap text input to toggle date picker
   };
 
   // handle date change
   const onChangeDate = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
+    if (event.type === "set") {
+      const currentDate = selectedDate || date;
+      setDate(currentDate);
+    }
     setShowDatePicker(false);
-    setDate(currentDate);
   };
 
   return (
@@ -122,7 +127,7 @@ const AddActivities = ({ navigation }) => {
       <TouchableOpacity onPress={handleDateInput} style={{ width: "100%" }}>
         <View pointerEvents="none">
           <TextInput
-            value={date.toLocaleDateString("en-US", dateOptions)}
+            value={date ? date.toLocaleDateString("en-US", dateOptions) : ""}
             style={[styles.input, { color: theme.textColor }]}
             editable={false} // Disable the keyboard interaction but allow onPress event
           />
@@ -133,7 +138,7 @@ const AddActivities = ({ navigation }) => {
       {showDatePicker && (
         <View style={styles.datePickerContainer}>
           <DateTimePicker
-            value={date}
+            value={date || new Date()}
             mode="date"
             display="inline"
             onChange={onChangeDate}

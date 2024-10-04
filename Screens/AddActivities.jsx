@@ -107,6 +107,7 @@ const AddActivities = ({ navigation }) => {
         setValue={setActivityType}
         setItems={setItems}
         style={styles.dropdown}
+        textStyle={{ color: colors.darkText }}
       />
 
       {/* Duration */}
@@ -117,7 +118,7 @@ const AddActivities = ({ navigation }) => {
         keyboardType="numeric"
         value={activityDuration}
         onChangeText={(text) => setActivityDuration(text)}
-        style={[styles.input, { color: theme.textColor }]}
+        style={styles.input}
         blurOnSubmit={true}
         returnKeyType="done" // added done to iOS numeric keyboard
       />
@@ -128,7 +129,7 @@ const AddActivities = ({ navigation }) => {
         <View pointerEvents="none">
           <TextInput
             value={date ? date.toLocaleDateString("en-US", dateOptions) : ""}
-            style={[styles.input, { color: theme.textColor }]}
+            style={styles.input}
             editable={false} // Disable the keyboard interaction but allow onPress event
           />
         </View>
@@ -188,6 +189,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     height: 40,
+    color: colors.darkText,
   },
   buttonContainer: {
     flexDirection: "row",

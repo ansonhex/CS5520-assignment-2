@@ -88,7 +88,7 @@ const AddDiet = ({ navigation }) => {
       <TextInput
         value={description}
         onChangeText={(text) => setDescription(text)}
-        style={[styles.input, { color: theme.textColor }]}
+        style={styles.input}
         blurOnSubmit={true}
       />
 
@@ -98,7 +98,7 @@ const AddDiet = ({ navigation }) => {
         keyboardType="numeric"
         value={calories}
         onChangeText={(text) => setCalories(text)}
-        style={[styles.input, { color: theme.textColor }]}
+        style={styles.input}
         blurOnSubmit={true}
         returnKeyType="done" // added done to iOS numeric keyboard
       />
@@ -109,7 +109,7 @@ const AddDiet = ({ navigation }) => {
         <View pointerEvents="none">
           <TextInput
             value={date ? date.toLocaleDateString("en-US", dateOptions) : ""}
-            style={[styles.input, { color: theme.textColor }]}
+            style={styles.input}
             editable={false} // Disable the keyboard interaction but allow onPress event
           />
         </View>
@@ -163,6 +163,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     height: 40,
+    color: colors.darkText,
   },
   buttonContainer: {
     flexDirection: "row",

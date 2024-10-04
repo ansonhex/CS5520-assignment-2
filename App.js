@@ -12,7 +12,6 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import colors from "./styles/colors";
 import ThemeProvider, { useTheme } from "./context/ThemeContext";
-import { useContext } from "react";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -25,7 +24,6 @@ const defaultScreenOptions = {
 };
 
 function ActivitiesStack() {
-  const { theme } = useTheme();
   return (
     <Stack.Navigator screenOptions={defaultScreenOptions}>
       <Stack.Screen
@@ -47,7 +45,6 @@ function ActivitiesStack() {
 }
 
 function DietStack() {
-  const { theme } = useTheme();
   return (
     <Stack.Navigator screenOptions={defaultScreenOptions}>
       <Stack.Screen
@@ -71,7 +68,6 @@ function DietStack() {
 function MainApp() {
   const { theme } = useTheme();
   return (
-    <ThemeProvider>
       <View
         style={[styles.container, { backgroundColor: theme.backgroundColor }]}
       >
@@ -116,7 +112,6 @@ function MainApp() {
           </Tab.Navigator>
         </NavigationContainer>
       </View>
-    </ThemeProvider>
   );
 }
 

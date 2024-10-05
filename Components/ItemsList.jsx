@@ -27,7 +27,7 @@ const ItemsList = ({ items, type }) => {
           <Text style={styles.details}>{item.date}</Text>
 
           {/* Right: durations or Calories */}
-          <Text style={styles.details}>
+          <Text style={styles.detailsCompact}>
             {type === "activity"
               ? `${item.duration} min`
               : `${item.calories} cal`}
@@ -73,8 +73,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     backgroundColor: "white",
+    height: 40,
     lineHeight: 40,
     marginLeft: 10,
     flex: 1,
   },
+  detailsCompact: {
+    color: colors.darkText,
+    fontWeight: "bold",
+    fontSize: 16,
+    textAlign: "center",
+    backgroundColor: "white",
+    height: 40,
+    lineHeight: 40,
+    marginLeft: 10,
+    flexShrink: 1,
+    paddingHorizontal: 10,
+  }
 });

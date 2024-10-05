@@ -24,14 +24,18 @@ const ItemsList = ({ items, type }) => {
           </View>
 
           {/* Middle: Date */}
-          <Text style={styles.details}>{item.date}</Text>
+          <View style={styles.detailsContainer}>
+            <Text style={styles.details}>{item.date}</Text>
+          </View>
 
           {/* Right: durations or Calories */}
-          <Text style={styles.detailsCompact}>
-            {type === "activity"
-              ? `${item.duration} min`
-              : `${item.calories} cal`}
-          </Text>
+          <View style={styles.detailsCompactContainer}>
+            <Text style={styles.details}>
+              {type === "activity"
+                ? `${item.duration} min`
+                : `${item.calories} cal`}
+            </Text>
+          </View>
         </View>
       ))}
     </View>
@@ -67,27 +71,27 @@ const styles = StyleSheet.create({
   icon: {
     marginLeft: 5,
   },
+  detailsContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+    height: 40,
+    marginLeft: 10,
+  },
+  detailsCompactContainer: {
+    flexShrink: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+    height: 40,
+    marginLeft: 10,
+    paddingHorizontal: 10,
+  },
   details: {
     color: colors.darkText,
     fontWeight: "bold",
     fontSize: 16,
     textAlign: "center",
-    backgroundColor: "white",
-    height: 40,
-    lineHeight: 40,
-    marginLeft: 10,
-    flex: 1,
   },
-  detailsCompact: {
-    color: colors.darkText,
-    fontWeight: "bold",
-    fontSize: 16,
-    textAlign: "center",
-    backgroundColor: "white",
-    height: 40,
-    lineHeight: 40,
-    marginLeft: 10,
-    flexShrink: 1,
-    paddingHorizontal: 10,
-  }
 });

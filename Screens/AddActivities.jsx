@@ -1,16 +1,14 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState, useContext } from "react";
-import { ActivityContext } from "../context/ActivityContext";
+import React, { useState } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useTheme } from "../context/ThemeContext";
 import colors from "../styles/colors";
 import PressableButton from "../Components/PressableButton";
+import { writeToDB } from "../firebase/firebaseHelper";
 
 const AddActivities = ({ navigation }) => {
   const { theme } = useTheme(); // get the theme from the context
-  const { addActivity } = useContext(ActivityContext); // get the addActivity function from the context
-  console.log(addActivity);
 
   const [activityType, setActivityType] = useState(null);
   const [activityDuration, setActivityDuration] = useState(null);
@@ -61,7 +59,8 @@ const AddActivities = ({ navigation }) => {
         special: isSpecial,
       };
 
-      addActivity(newActivity);
+      // write to firestore
+      writeToDB("activities", newActivity);
       navigation.goBack();
     }
   };

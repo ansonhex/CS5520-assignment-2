@@ -1,12 +1,13 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
-import { ActivityContext } from "../context/ActivityContext";
 import ItemsList from "../Components/ItemsList";
 import { useTheme } from "../context/ThemeContext";
 import PressableButton from "../Components/PressableButton";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 const Activities = ({ navigation }) => {
-  const { activities } = useContext(ActivityContext);
+  const [activities, setActivities] = useState([]);
   const { theme } = useTheme();
 
   // headerRight button
@@ -21,6 +22,30 @@ const Activities = ({ navigation }) => {
       ),
     });
   }, [navigation, theme]);
+
+  // read data from Firestore with snapshot
+  useEffect(() => {
+    let unsubscribe;
+
+    try {
+      unsubscribe = onSnapshot(collection(db, "activities"), (snapshot) => {
+        const activitiesData = [];
+        snapshot.forEach((doc) => {
+          activitiesData.push({ id: doc.id, ...doc.data() });
+        });
+        setActivities(activitiesData);
+      });
+    } catch (error) {
+      console.error("Error reading document: ", error);
+    }
+
+    // Clean up the listener when the component unmounts
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, []);
 
   return (
     <View

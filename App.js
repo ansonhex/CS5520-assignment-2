@@ -12,8 +12,6 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import colors from "./styles/colors";
 import ThemeProvider, { useTheme } from "./context/ThemeContext";
-import { ActivityProvider } from "./context/ActivityContext";
-import { DietProvider } from "./context/DietContext";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -121,11 +119,7 @@ export default function App() {
   // wrapped the MainApp with the all the context providers
   return (
     <ThemeProvider>
-      <ActivityProvider>  
-        <DietProvider>
-          <MainApp />
-        </DietProvider>
-      </ActivityProvider>
+      <MainApp />
     </ThemeProvider>
   );
 }

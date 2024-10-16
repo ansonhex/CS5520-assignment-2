@@ -1,14 +1,13 @@
 import { StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState, useContext } from "react";
-import { DietContext } from "../context/DietContext";
+import React, { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useTheme } from "../context/ThemeContext";
 import colors from "../styles/colors";
 import PressableButton from "../Components/PressableButton";
+import { writeToDB } from "../firebase/firebaseHelper";
 
 const AddDiet = ({ navigation }) => {
   const { theme } = useTheme(); // get the theme from the context
-  const { addDiet } = useContext(DietContext); // get the addDiet function from the context
 
   const [description, setDescription] = useState("");
   const [calories, setCalories] = useState("");
@@ -47,7 +46,7 @@ const AddDiet = ({ navigation }) => {
         special: isSpecial,
       };
 
-      addDiet(newDiet);
+      writeToDB("diets", newDiet); // write to Firestore
       navigation.goBack();
     }
   };

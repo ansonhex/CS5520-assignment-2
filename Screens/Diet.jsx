@@ -5,6 +5,8 @@ import { useTheme } from "../context/ThemeContext";
 import PressableButton from "../Components/PressableButton";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 const Diet = ({ navigation }) => {
   const [diets, setDiets] = useState([]);
@@ -15,7 +17,15 @@ const Diet = ({ navigation }) => {
     navigation.setOptions({
       headerRight: () => (
         <PressableButton onPress={() => navigation.navigate("AddDietScreen")}>
-          <Text style={styles.header}>Add</Text>
+          <View style={styles.header}>
+            <AntDesign
+              name="plus"
+              size={20}
+              color="white"
+              style={{ paddingRight: 5 }}
+            />
+            <MaterialIcons name="fastfood" size={20} color="white" />
+          </View>
         </PressableButton>
       ),
     });
@@ -63,8 +73,7 @@ const styles = StyleSheet.create({
   },
   header: {
     color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
     marginRight: 20,
+    flexDirection: "row",
   },
 });

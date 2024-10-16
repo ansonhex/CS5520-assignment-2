@@ -5,6 +5,8 @@ import { useTheme } from "../context/ThemeContext";
 import PressableButton from "../Components/PressableButton";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 const Activities = ({ navigation }) => {
   const [activities, setActivities] = useState([]);
@@ -17,7 +19,15 @@ const Activities = ({ navigation }) => {
         <PressableButton
           onPress={() => navigation.navigate("AddActivitiesScreen")}
         >
-          <Text style={styles.header}>Add</Text>
+          <View style={styles.header}>
+            <AntDesign
+              name="plus"
+              size={20}
+              color="white"
+              style={{ paddingRight: 5 }}
+            />
+            <FontAwesome5 name="running" size={20} color="white" />
+          </View>
         </PressableButton>
       ),
     });
@@ -65,8 +75,7 @@ const styles = StyleSheet.create({
   },
   header: {
     color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
     marginRight: 20,
+    flexDirection: "row",
   },
 });

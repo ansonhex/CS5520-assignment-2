@@ -1,8 +1,9 @@
 import React, { useContext, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import { DietContext } from '../context/DietContext';
 import ItemsList from '../Components/ItemsList';
 import { useTheme } from '../context/ThemeContext';
+import PressableButton from '../Components/PressableButton';
 
 const Diet = ({ navigation }) => {
   const { diets } = useContext(DietContext);
@@ -12,9 +13,9 @@ const Diet = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('AddDietScreen')}>
+        <PressableButton onPress={() => navigation.navigate('AddDietScreen')}>
           <Text style={styles.header}>Add</Text>
-        </TouchableOpacity>
+        </PressableButton>
       ),
     });
   }, [navigation, theme]);

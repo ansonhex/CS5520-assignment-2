@@ -1,15 +1,10 @@
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useState, useContext } from "react";
 import { DietContext } from "../context/DietContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useTheme } from "../context/ThemeContext";
 import colors from "../styles/colors";
+import PressableButton from "../Components/PressableButton";
 
 const AddDiet = ({ navigation }) => {
   const { theme } = useTheme(); // get the theme from the context
@@ -84,7 +79,9 @@ const AddDiet = ({ navigation }) => {
       style={[styles.container, { backgroundColor: theme.backgroundColor }]}
     >
       {/* Description */}
-      <Text style={[styles.label, { color: theme.textColor }]}>Description *</Text>
+      <Text style={[styles.label, { color: theme.textColor }]}>
+        Description *
+      </Text>
       <TextInput
         value={description}
         onChangeText={(text) => setDescription(text)}
@@ -104,16 +101,18 @@ const AddDiet = ({ navigation }) => {
       />
 
       {/* DatePicker Text */}
-      <Text style={[styles.label, { color: theme.textColor }]}>Date *</Text>
-      <TouchableOpacity onPress={handleDateInput} style={{ width: "100%" }}>
-        <View pointerEvents="none">
-          <TextInput
-            value={date ? date.toLocaleDateString("en-US", dateOptions) : ""}
-            style={styles.input}
-            editable={false} // Disable the keyboard interaction but allow onPress event
-          />
-        </View>
-      </TouchableOpacity>
+      <View style={{ width: "100%" }}>
+        <Text style={[styles.label, { color: theme.textColor }]}>Date *</Text>
+        <PressableButton onPress={handleDateInput} style={{ width: "100%" }}>
+          <View pointerEvents="none">
+            <TextInput
+              value={date ? date.toLocaleDateString("en-US", dateOptions) : ""}
+              style={styles.input}
+              editable={false} // Disable the keyboard interaction but allow onPress event
+            />
+          </View>
+        </PressableButton>
+      </View>
 
       {/* DatePicker, wrapped in view for center */}
       {showDatePicker && (
@@ -129,12 +128,12 @@ const AddDiet = ({ navigation }) => {
 
       {/* Save and Cancel Buttons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleCancel} style={styles.button}>
+        <PressableButton onPress={handleCancel} style={styles.button}>
           <Text style={styles.buttonText}>Cancel</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleSave} style={styles.button}>
+        </PressableButton>
+        <PressableButton onPress={handleSave} style={styles.button}>
           <Text style={styles.buttonText}>Save</Text>
-        </TouchableOpacity>
+        </PressableButton>
       </View>
     </View>
   );

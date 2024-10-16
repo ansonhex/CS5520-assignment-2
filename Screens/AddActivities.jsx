@@ -20,7 +20,9 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
   const [date, setDate] = useState(null); // initialize the date to null
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [isSpecial, setIsSpecial] = useState(false);
+  const [isSpecial, setIsSpecial] = useState(false); // for the special status
+  const [showCheckbox, setShowCheckbox] = useState(false); // to control the checkbox visibility
+
   const [items, setItems] = useState([
     { label: "Walking", value: "Walking" },
     { label: "Running", value: "Running" },
@@ -38,7 +40,7 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
     day: "numeric",
   };
 
-  // prefill the data if it's edit mode
+  // Prefill data if it's edit mode
   useEffect(() => {
     if (isEditMode && route.params?.item) {
       const { item } = route.params;
@@ -48,13 +50,41 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
 
       // Convert Firestore timestamp to Date object
       const timestampDate = new Date(item.date);
-      console.log("timestampDate: ", timestampDate);
       setDate(timestampDate);
       setIsSpecial(item.special || false);
+      setShowCheckbox(item.special); // Show checkbox if item was previously special
     }
   }, [isEditMode, route.params]);
 
-  // validate the form and data
+  // Automatically check special status based on activity type and duration
+  useEffect(() => {
+    if (
+      (activityType === "Running" || activityType === "Weights") &&
+      activityDuration > 60
+    ) {
+      setIsSpecial(true); // Automatically set special to true based on the condition
+      setShowCheckbox(true); // Show the checkbox
+    } else {
+      setIsSpecial(false); // Not special, set it to false
+      setShowCheckbox(false); // Hide the checkbox if not special
+    }
+  }, [activityType, activityDuration]); // Run this effect whenever activityType or activityDuration changes
+
+  // Re-evaluate special status and checkbox visibility based on activity type and duration only when saving
+  const checkSpecialStatus = () => {
+    if (
+      (activityType === "Running" || activityType === "Weights") &&
+      activityDuration > 60
+    ) {
+      setIsSpecial(true); // Set as special
+      setShowCheckbox(true); // Show checkbox only if the activity qualifies as special
+    } else {
+      setIsSpecial(false); // Not special anymore
+      setShowCheckbox(false); // Hide checkbox for non-special activities
+    }
+  };
+
+  // Validate the form and data
   const validateData = () => {
     if (!activityType) {
       alert("Please select an activity type");
@@ -67,7 +97,7 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
     return true;
   };
 
-  // handle delete (edit mode)
+  // Handle delete (edit mode)
   const handleDelete = () => {
     Alert.alert(
       "Confirm Delete",
@@ -90,25 +120,17 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
     );
   };
 
-  // handle Save button
+  // Handle save button
   const handleSave = () => {
     if (validateData()) {
-      let specialStatus = isSpecial;
-      if (!isEditMode) {
-        specialStatus =
-          (activityType === "Running" || activityType === "Weights") &&
-          activityDuration > 60;
-      }
-
       const newActivity = {
         type: activityType,
         duration: activityDuration,
-        date: date.getTime(),
-        special: specialStatus,
+        date: date.getTime(), // Store as timestamp
+        special: isSpecial, // Save special status
       };
 
       if (isEditMode) {
-        // edit mode, update the existing record
         Alert.alert(
           "Important",
           "Are you sure you want to save these changes?",
@@ -124,27 +146,27 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
           ]
         );
       } else {
-        // add mode, add a new record
         writeToDB("activities", newActivity);
+        console.log("New activity added: ", newActivity);
         navigation.goBack();
       }
     }
   };
 
-  // handle Cancel button
+  // Handle cancel button
   const handleCancel = () => {
     navigation.goBack();
   };
 
-  // handle date input to show
+  // Handle date input to show
   const handleDateInput = () => {
     if (!date) {
       setDate(new Date());
     }
-    setShowDatePicker(!showDatePicker); // tap text input to toggle date picker
+    setShowDatePicker(!showDatePicker); // Toggle date picker visibility
   };
 
-  // handle date change
+  // Handle date change
   const onChangeDate = (event, selectedDate) => {
     if (event.type === "set") {
       const currentDate = selectedDate || date;
@@ -213,17 +235,19 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
         </View>
       )}
 
-      {/* Edit mode: checkbox */}
-      {isEditMode && (
+      {/* Show Checkbox only if the activity is special */}
+      {showCheckbox && (
         <View style={styles.checkboxContainer}>
           <Checkbox
-            value={isSpecial}
-            onValueChange={setIsSpecial}
+            value={isSpecial} // This should reflect the current isSpecial status
+            onValueChange={(newValue) => {
+              setIsSpecial(newValue); // Toggle isSpecial when user interacts with the checkbox
+            }}
             style={{ marginRight: 10 }}
           />
           <Text style={[styles.checkbox, { color: theme.textColor }]}>
             This item is marked as special. Select the checkbox if you would
-            like to approve it.
+            like to approve or disapprove the special status.
           </Text>
         </View>
       )}
@@ -301,6 +325,8 @@ const styles = StyleSheet.create({
   },
   checkboxContainer: {
     flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   checkbox: {
     fontSize: 14,

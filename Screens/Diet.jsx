@@ -55,11 +55,16 @@ const Diet = ({ navigation }) => {
     };
   }, []);
 
+  // handle to navigate to edit
+  const handleEdit = (item) => {
+    navigation.navigate("EditDietScreen", { item });
+  };
+
   return (
     <View
       style={[styles.container, { backgroundColor: theme.backgroundColor }]}
     >
-      <ItemsList items={diets} type="diet" />
+      <ItemsList items={diets} type="diet" onPress={handleEdit} />
     </View>
   );
 };

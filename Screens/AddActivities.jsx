@@ -1,13 +1,18 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import { StyleSheet, Text, TextInput, View, Alert } from "react-native";
+import Checkbox from "expo-checkbox";
+import React, { useState, useEffect } from "react";
 import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useTheme } from "../context/ThemeContext";
 import colors from "../styles/colors";
 import PressableButton from "../Components/PressableButton";
-import { writeToDB } from "../firebase/firebaseHelper";
+import {
+  writeToDB,
+  deleteFromDB,
+  updateToDB,
+} from "../firebase/firebaseHelper";
 
-const AddActivities = ({ navigation }) => {
+const AddActivities = ({ navigation, route, isEditMode = false }) => {
   const { theme } = useTheme(); // get the theme from the context
 
   const [activityType, setActivityType] = useState(null);
@@ -15,6 +20,7 @@ const AddActivities = ({ navigation }) => {
   const [date, setDate] = useState(null); // initialize the date to null
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isSpecial, setIsSpecial] = useState(false);
   const [items, setItems] = useState([
     { label: "Walking", value: "Walking" },
     { label: "Running", value: "Running" },
@@ -32,6 +38,22 @@ const AddActivities = ({ navigation }) => {
     day: "numeric",
   };
 
+  // prefill the data if it's edit mode
+  useEffect(() => {
+    if (isEditMode && route.params?.item) {
+      const { item } = route.params;
+
+      setActivityType(item.type);
+      setActivityDuration(item.duration);
+
+      // Convert Firestore timestamp to Date object
+      const timestampDate = new Date(item.date);
+      console.log("timestampDate: ", timestampDate);
+      setDate(timestampDate);
+      setIsSpecial(item.special || false);
+    }
+  }, [isEditMode, route.params]);
+
   // validate the form and data
   const validateData = () => {
     if (!activityType) {
@@ -45,23 +67,67 @@ const AddActivities = ({ navigation }) => {
     return true;
   };
 
+  // handle delete (edit mode)
+  const handleDelete = () => {
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this entry?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          onPress: async () => {
+            try {
+              await deleteFromDB("activities", route.params.item.id);
+              navigation.goBack();
+            } catch (error) {
+              console.error("Error deleting document: ", error);
+            }
+          },
+          style: "destructive",
+        },
+      ]
+    );
+  };
+
   // handle Save button
   const handleSave = () => {
     if (validateData()) {
-      const isSpecial =
-        (activityType === "Running" || activityType === "Weights") &&
-        activityDuration > 60;
+      let specialStatus = isSpecial;
+      if (!isEditMode) {
+        specialStatus =
+          (activityType === "Running" || activityType === "Weights") &&
+          activityDuration > 60;
+      }
 
       const newActivity = {
         type: activityType,
         duration: activityDuration,
-        date: date.toLocaleDateString("en-US", dateOptions),
-        special: isSpecial,
+        date: date.getTime(),
+        special: specialStatus,
       };
 
-      // write to firestore
-      writeToDB("activities", newActivity);
-      navigation.goBack();
+      if (isEditMode) {
+        // edit mode, update the existing record
+        Alert.alert(
+          "Important",
+          "Are you sure you want to save these changes?",
+          [
+            { text: "No" },
+            {
+              text: "Yes",
+              onPress: () => {
+                updateToDB("activities", route.params.item.id, newActivity);
+                navigation.goBack();
+              },
+            },
+          ]
+        );
+      } else {
+        // add mode, add a new record
+        writeToDB("activities", newActivity);
+        navigation.goBack();
+      }
     }
   };
 
@@ -123,7 +189,11 @@ const AddActivities = ({ navigation }) => {
         <PressableButton onPress={handleDateInput}>
           <View pointerEvents="none">
             <TextInput
-              value={date ? date.toLocaleDateString("en-US", dateOptions) : ""}
+              value={
+                date
+                  ? new Date(date).toLocaleDateString("en-US", dateOptions)
+                  : ""
+              }
               style={styles.input}
               editable={false} // Disable the keyboard interaction but allow onPress event
             />
@@ -143,6 +213,21 @@ const AddActivities = ({ navigation }) => {
         </View>
       )}
 
+      {/* Edit mode: checkbox */}
+      {isEditMode && (
+        <View style={styles.checkboxContainer}>
+          <Checkbox
+            value={isSpecial}
+            onValueChange={setIsSpecial}
+            style={{ marginRight: 10 }}
+          />
+          <Text style={[styles.checkbox, { color: theme.textColor }]}>
+            This item is marked as special. Select the checkbox if you would
+            like to approve it.
+          </Text>
+        </View>
+      )}
+
       {/* Save and Cancel Buttons */}
       <View style={styles.buttonContainer}>
         <PressableButton onPress={handleCancel} style={styles.button}>
@@ -152,6 +237,13 @@ const AddActivities = ({ navigation }) => {
           <Text style={styles.buttonText}>Save</Text>
         </PressableButton>
       </View>
+
+      {/* Edit mode: Delete button */}
+      {isEditMode && (
+        <PressableButton onPress={handleDelete} style={styles.deleteButton}>
+          <Text style={styles.buttonText}>Delete</Text>
+        </PressableButton>
+      )}
     </View>
   );
 };
@@ -206,5 +298,12 @@ const styles = StyleSheet.create({
   datePickerContainer: {
     width: "100%",
     alignItems: "center",
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+  },
+  checkbox: {
+    fontSize: 14,
+    fontWeight: "bold",
   },
 });

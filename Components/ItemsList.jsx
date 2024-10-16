@@ -2,12 +2,24 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import colors from "../styles/colors";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import PressableButton from "./PressableButton";
 
-const ItemsList = ({ items, type }) => {
+const dateOptions = {
+  weekday: "short",
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+};
+
+const ItemsList = ({ items, type, onPress }) => {
   return (
     <View style={styles.container}>
       {items.map((item, index) => (
-        <View key={index} style={styles.item}>
+        <PressableButton
+          key={index}
+          onPress={() => onPress(item)}
+          style={styles.item}
+        >
           {/* Left: Type or Description */}
           <View style={styles.titleContainer}>
             <Text style={styles.title}>
@@ -25,7 +37,11 @@ const ItemsList = ({ items, type }) => {
 
           {/* Middle: Date */}
           <View style={styles.detailsContainer}>
-            <Text style={styles.details}>{item.date}</Text>
+            <Text style={styles.details}>
+              {item.date
+                ? new Date(item.date).toLocaleDateString("en-US", dateOptions)
+                : "No Date"}
+            </Text>
           </View>
 
           {/* Right: durations or Calories */}
@@ -36,7 +52,7 @@ const ItemsList = ({ items, type }) => {
                 : `${item.calories} cal`}
             </Text>
           </View>
-        </View>
+        </PressableButton>
       ))}
     </View>
   );

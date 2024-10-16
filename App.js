@@ -12,6 +12,7 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import colors from "./styles/colors";
 import ThemeProvider, { useTheme } from "./context/ThemeContext";
+import EditActivities from "./Screens/EditActivities";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -40,6 +41,13 @@ function ActivitiesStack() {
           title: "Add An Activity",
         }}
       />
+      <Stack.Screen
+        name="EditActivityScreen"
+        component={EditActivities}
+        options={{
+          title: "Edit An Activity",
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -61,6 +69,13 @@ function DietStack() {
           title: "Add A Diet Entry",
         }}
       />
+      {/* <Stack.Screen
+        name="EditDietScreen"
+        component={EditDiet}
+        options={{
+          title: "Edit A Diet Entry",
+        }}
+      /> */}
     </Stack.Navigator>
   );
 }

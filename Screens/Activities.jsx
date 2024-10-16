@@ -57,11 +57,17 @@ const Activities = ({ navigation }) => {
     };
   }, []);
 
+  // handle to navigate to edit
+  const handlePressItem = (item) => {
+    console.log("item", item);
+    navigation.navigate("EditActivityScreen", { item });
+  };
+
   return (
     <View
       style={[styles.container, { backgroundColor: theme.backgroundColor }]}
     >
-      <ItemsList items={activities} type="activity" />
+      <ItemsList items={activities} type="activity" onPress={handlePressItem} />
     </View>
   );
 };

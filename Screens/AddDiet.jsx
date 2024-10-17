@@ -1,18 +1,28 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import { StyleSheet, Text, TextInput, View, Alert } from "react-native";
+import React, { useState, useEffect } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useTheme } from "../context/ThemeContext";
 import colors from "../styles/colors";
 import PressableButton from "../Components/PressableButton";
-import { writeToDB } from "../firebase/firebaseHelper";
+import {
+  writeToDB,
+  deleteFromDB,
+  updateToDB,
+} from "../firebase/firebaseHelper";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import Checkbox from "expo-checkbox";
 
-const AddDiet = ({ navigation }) => {
+const AddDiet = ({ navigation, route, isEditMode = false }) => {
   const { theme } = useTheme(); // get the theme from the context
 
   const [description, setDescription] = useState("");
   const [calories, setCalories] = useState("");
   const [date, setDate] = useState(null); // initialize the date to null
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isSpecial, setIsSpecial] = useState(false);
+  const [showCheckbox, setShowCheckbox] = useState(false);
+  const [isSpecialManuallyChanged, setIsSpecialManuallyChanged] =
+    useState(false);
 
   const dateOptions = {
     weekday: "short",
@@ -34,20 +44,98 @@ const AddDiet = ({ navigation }) => {
     return true;
   };
 
+  // prefill the data if in edit mode
+  useEffect(() => {
+    if (isEditMode && route.params?.item) {
+      const { item } = route.params;
+      setDescription(item.description);
+      setCalories(item.calories.toString());
+      setDate(new Date(item.date));
+      setIsSpecial(item.special || false);
+      setShowCheckbox(item.special);
+    }
+  }, [isEditMode, route.params]);
+
+  // set delete button to header right in edit mode
+  useEffect(() => {
+    if (isEditMode) {
+      navigation.setOptions({
+        headerRight: () => (
+          <PressableButton onPress={handleDelete}>
+            <FontAwesome
+              name="trash"
+              size={20}
+              color="white"
+              style={{ paddingRight: 20 }}
+            />
+          </PressableButton>
+        ),
+      });
+    }
+  }, [navigation, isEditMode]);
+
+  // Handle delete (edit mode)
+  const handleDelete = () => {
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this entry?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          onPress: async () => {
+            try {
+              await deleteFromDB("diets", route.params.item.id);
+              navigation.goBack();
+            } catch (error) {
+              console.error("Error deleting document: ", error);
+            }
+          },
+          style: "destructive",
+        },
+      ]
+    );
+  };
+
   // handle Save button
   const handleSave = () => {
     if (validateData()) {
-      const isSpecial = calories > 800;
+      let specialStatus = isSpecial;
+      if (!isSpecialManuallyChanged) {
+        if (calories > 800) {
+          specialStatus = true;
+        } else {
+          specialStatus = false;
+        }
+      }
 
       const newDiet = {
         description,
         calories: Number(calories),
-        date: date ? date.toLocaleDateString("en-US", dateOptions) : "",
-        special: isSpecial,
+        date: date.getTime(),
+        special: specialStatus,
       };
 
-      writeToDB("diets", newDiet); // write to Firestore
-      navigation.goBack();
+      if (isEditMode) {
+        Alert.alert(
+          "Important",
+          "Are you sure you want to save these changes?",
+          [
+            { text: "No" },
+            {
+              text: "Yes",
+              onPress: () => {
+                updateToDB("diets", route.params.item.id, newDiet);
+                console.log("Updated item: ", newDiet);
+                navigation.goBack();
+              },
+            },
+          ]
+        );
+      } else {
+        writeToDB("diets", newDiet);
+        navigation.goBack();
+      }
     }
   };
 
@@ -71,6 +159,22 @@ const AddDiet = ({ navigation }) => {
       setDate(currentDate);
     }
     setShowDatePicker(false);
+  };
+
+  // handle checkbox change
+  const handleSpecialCheckboxChange = (newValue) => {
+    const updatedSpecialStatus = !newValue;
+    setIsSpecial(updatedSpecialStatus);
+    setIsSpecialManuallyChanged(true);
+
+    if (isEditMode) {
+      const updatedActivity = {
+        ...route.params.item,
+        special: updatedSpecialStatus,
+      };
+
+      updateToDB("diets", route.params.item.id, updatedActivity);
+    }
   };
 
   return (
@@ -105,7 +209,11 @@ const AddDiet = ({ navigation }) => {
         <PressableButton onPress={handleDateInput} style={{ width: "100%" }}>
           <View pointerEvents="none">
             <TextInput
-              value={date ? date.toLocaleDateString("en-US", dateOptions) : ""}
+              value={
+                date
+                  ? new Date(date).toLocaleDateString("en-US", dateOptions)
+                  : ""
+              }
               style={styles.input}
               editable={false} // Disable the keyboard interaction but allow onPress event
             />
@@ -121,6 +229,21 @@ const AddDiet = ({ navigation }) => {
             mode="date"
             display="inline"
             onChange={onChangeDate}
+          />
+        </View>
+      )}
+
+      {/* Show Checkbox only if the activity is special */}
+      {showCheckbox && (
+        <View style={styles.checkboxContainer}>
+          <Text style={[styles.checkbox, { color: theme.textColor }]}>
+            This item is marked as special. Select the checkbox if you would
+            like to disapprove the special status.
+          </Text>
+          <Checkbox
+            value={!isSpecial} // default value is false
+            onValueChange={handleSpecialCheckboxChange}
+            style={{ marginHorizontal: 10 }}
           />
         </View>
       )}
@@ -182,5 +305,16 @@ const styles = StyleSheet.create({
   datePickerContainer: {
     width: "100%",
     alignItems: "center",
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 10,
+  },
+  checkbox: {
+    fontSize: 14,
+    fontWeight: "bold",
+    marginHorizontal: 10,
   },
 });

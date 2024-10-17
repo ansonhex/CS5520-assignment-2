@@ -13,6 +13,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import colors from "./styles/colors";
 import ThemeProvider, { useTheme } from "./context/ThemeContext";
 import EditActivities from "./Screens/EditActivities";
+import EditDiet from "./Screens/EditDiet";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -69,13 +70,13 @@ function DietStack() {
           title: "Add A Diet Entry",
         }}
       />
-      {/* <Stack.Screen
+      <Stack.Screen
         name="EditDietScreen"
         component={EditDiet}
         options={{
           title: "Edit A Diet Entry",
         }}
-      /> */}
+      />
     </Stack.Navigator>
   );
 }

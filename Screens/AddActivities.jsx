@@ -11,6 +11,7 @@ import {
   deleteFromDB,
   updateToDB,
 } from "../firebase/firebaseHelper";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const AddActivities = ({ navigation, route, isEditMode = false }) => {
   const { theme } = useTheme(); // get the theme from the context
@@ -70,6 +71,24 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
     }
     return true;
   };
+
+  // set delete button to header right in edit mode
+  useEffect(() => {
+    if (isEditMode) {
+      navigation.setOptions({
+        headerRight: () => (
+          <PressableButton onPress={handleDelete}>
+            <FontAwesome
+              name="trash"
+              size={20}
+              color="white"
+              style={{ paddingRight: 20 }}
+            />
+          </PressableButton>
+        ),
+      });
+    }
+  }, [navigation, isEditMode]);
 
   // Handle delete (edit mode)
   const handleDelete = () => {
@@ -245,15 +264,15 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
       {/* Show Checkbox only if the activity is special */}
       {showCheckbox && (
         <View style={styles.checkboxContainer}>
-          <Checkbox
-            value={!isSpecial} // default value is false
-            onValueChange={handleSpecialCheckboxChange}
-            style={{ marginRight: 10 }}
-          />
           <Text style={[styles.checkbox, { color: theme.textColor }]}>
             This item is marked as special. Select the checkbox if you would
             like to disapprove the special status.
           </Text>
+          <Checkbox
+            value={!isSpecial} // default value is false
+            onValueChange={handleSpecialCheckboxChange}
+            style={{ marginHorizontal: 10 }}
+          />
         </View>
       )}
 
@@ -266,13 +285,6 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
           <Text style={styles.buttonText}>Save</Text>
         </PressableButton>
       </View>
-
-      {/* Edit mode: Delete button */}
-      {isEditMode && (
-        <PressableButton onPress={handleDelete} style={styles.deleteButton}>
-          <Text style={styles.buttonText}>Delete</Text>
-        </PressableButton>
-      )}
     </View>
   );
 };
@@ -332,9 +344,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 10,
   },
   checkbox: {
     fontSize: 14,
     fontWeight: "bold",
+    marginHorizontal: 10,
   },
 });

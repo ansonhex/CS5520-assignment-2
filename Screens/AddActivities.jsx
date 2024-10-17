@@ -22,6 +22,8 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isSpecial, setIsSpecial] = useState(false); // for the special status
   const [showCheckbox, setShowCheckbox] = useState(false); // to control the checkbox visibility
+  const [isSpecialManuallyChanged, setIsSpecialManuallyChanged] =
+    useState(false); // to track if the checkbox is manually changed
 
   const [items, setItems] = useState([
     { label: "Walking", value: "Walking" },
@@ -55,34 +57,6 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
       setShowCheckbox(item.special); // Show checkbox if item was previously special
     }
   }, [isEditMode, route.params]);
-
-  // Automatically check special status based on activity type and duration
-  useEffect(() => {
-    if (
-      (activityType === "Running" || activityType === "Weights") &&
-      activityDuration > 60
-    ) {
-      setIsSpecial(true); // Automatically set special to true based on the condition
-      setShowCheckbox(true); // Show the checkbox
-    } else {
-      setIsSpecial(false); // Not special, set it to false
-      setShowCheckbox(false); // Hide the checkbox if not special
-    }
-  }, [activityType, activityDuration]); // Run this effect whenever activityType or activityDuration changes
-
-  // Re-evaluate special status and checkbox visibility based on activity type and duration only when saving
-  const checkSpecialStatus = () => {
-    if (
-      (activityType === "Running" || activityType === "Weights") &&
-      activityDuration > 60
-    ) {
-      setIsSpecial(true); // Set as special
-      setShowCheckbox(true); // Show checkbox only if the activity qualifies as special
-    } else {
-      setIsSpecial(false); // Not special anymore
-      setShowCheckbox(false); // Hide checkbox for non-special activities
-    }
-  };
 
   // Validate the form and data
   const validateData = () => {
@@ -123,11 +97,25 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
   // Handle save button
   const handleSave = () => {
     if (validateData()) {
+      let specialStatus = isSpecial;
+
+      // Only update special status if it's not manually changed
+      if (!isSpecialManuallyChanged) {
+        if (
+          (activityType === "Running" || activityType === "Weights") &&
+          activityDuration > 60
+        ) {
+          specialStatus = true;
+        } else {
+          specialStatus = false;
+        }
+      }
+
       const newActivity = {
         type: activityType,
         duration: activityDuration,
         date: date.getTime(), // Store as timestamp
-        special: isSpecial, // Save special status
+        special: specialStatus, // Save special status
       };
 
       if (isEditMode) {
@@ -140,6 +128,7 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
               text: "Yes",
               onPress: () => {
                 updateToDB("activities", route.params.item.id, newActivity);
+                console.log("Updated item: ", newActivity);
                 navigation.goBack();
               },
             },
@@ -147,7 +136,6 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
         );
       } else {
         writeToDB("activities", newActivity);
-        console.log("New activity added: ", newActivity);
         navigation.goBack();
       }
     }
@@ -173,6 +161,25 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
       setDate(currentDate);
     }
     setShowDatePicker(false);
+  };
+
+  // handle checkbox change
+  const handleSpecialCheckboxChange = (newValue) => {
+    const updatedSpecialStatus = !newValue;
+    setIsSpecial(updatedSpecialStatus);
+    setIsSpecialManuallyChanged(true); // Set the flag to true
+
+    // defensive coding, push the updated special status to the state
+    if (isEditMode) {
+      const updatedActivity = {
+        type: activityType,
+        duration: activityDuration,
+        date: date.getTime(),
+        special: updatedSpecialStatus,
+      };
+
+      updateToDB("activities", route.params.item.id, updatedActivity);
+    }
   };
 
   return (
@@ -239,15 +246,13 @@ const AddActivities = ({ navigation, route, isEditMode = false }) => {
       {showCheckbox && (
         <View style={styles.checkboxContainer}>
           <Checkbox
-            value={isSpecial} // This should reflect the current isSpecial status
-            onValueChange={(newValue) => {
-              setIsSpecial(newValue); // Toggle isSpecial when user interacts with the checkbox
-            }}
+            value={!isSpecial} // default value is false
+            onValueChange={handleSpecialCheckboxChange}
             style={{ marginRight: 10 }}
           />
           <Text style={[styles.checkbox, { color: theme.textColor }]}>
             This item is marked as special. Select the checkbox if you would
-            like to approve or disapprove the special status.
+            like to disapprove the special status.
           </Text>
         </View>
       )}

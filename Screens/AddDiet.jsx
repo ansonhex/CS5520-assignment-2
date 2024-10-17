@@ -238,7 +238,7 @@ const AddDiet = ({ navigation, route, isEditMode = false }) => {
         <View style={styles.checkboxContainer}>
           <Text style={[styles.checkbox, { color: theme.textColor }]}>
             This item is marked as special. Select the checkbox if you would
-            like to disapprove the special status.
+            like to approve it.
           </Text>
           <Checkbox
             value={!isSpecial} // default value is false
